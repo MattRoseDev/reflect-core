@@ -1,0 +1,25 @@
+scalar Time
+
+input LoginInput {
+  username: String!
+  password: String!
+}
+
+input RegisterInput {
+  email: String!
+  username: String!
+  password: String!
+}
+
+extend type Query {
+  login(input: LoginInput): AuthOutput!
+}
+
+extend type Mutation {
+  register(input: RegisterInput): AuthOutput!
+}
+
+type AuthOutput {
+  token: String!
+  user: User
+}

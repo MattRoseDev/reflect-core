@@ -1,0 +1,12 @@
+type User {
+  id: ID!
+  username: String!
+  password: String!
+  email: String!
+  fullname: String
+  bio: String
+  admin: Boolean!
+  createdAt: Time
+  updatedAt: Time
+  deletedAt: Time
+}

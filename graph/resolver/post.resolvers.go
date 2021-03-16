@@ -11,11 +11,23 @@ import (
 	"github.com/favecode/reflect-core/graph/model"
 )
 
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
+func (r *mutationResolver) AddPost(ctx context.Context, input *model.AddPostInput) (*model.Post, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
+func (r *mutationResolver) EditPost(ctx context.Context, input *model.EditPostInput) (*model.Post, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeletePost(ctx context.Context, input *model.DeletePostInput) (*model.Post, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) GetPost(ctx context.Context, input *model.GetPostInput) (*model.Post, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInput) ([]*model.Post, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

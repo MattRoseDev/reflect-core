@@ -2,19 +2,65 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+import (
+	"time"
+)
+
+type AddPostInput struct {
+	Content string `json:"content"`
 }
 
-type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+type AuthOutput struct {
+	Token string `json:"token"`
+	User  *User  `json:"user"`
+}
+
+type DeletePostInput struct {
+	PostID string `json:"postId"`
+}
+
+type EditPostInput struct {
+	PostID  string `json:"postId"`
+	Content string `json:"content"`
+}
+
+type GetPostInput struct {
+	PostID string `json:"postId"`
+}
+
+type GetPostsByUsernameInput struct {
+	Username string `json:"username"`
+}
+
+type LoginInput struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type Post struct {
+	ID        string     `json:"id"`
+	Content   string     `json:"content"`
+	User      *User      `json:"user"`
+	CreatedAt *time.Time `json:"createdAt"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+	DeletedAt *time.Time `json:"deletedAt"`
+}
+
+type RegisterInput struct {
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID        string     `json:"id"`
+	Username  string     `json:"username"`
+	Password  string     `json:"password"`
+	Email     string     `json:"email"`
+	Fullname  *string    `json:"fullname"`
+	Bio       *string    `json:"bio"`
+	Admin     bool       `json:"admin"`
+	CreatedAt *time.Time `json:"createdAt"`
+	UpdatedAt *time.Time `json:"updatedAt"`
+	DeletedAt *time.Time `json:"deletedAt"`
 }
