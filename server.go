@@ -7,8 +7,8 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/favecode/reflect-core/graph"
 	"github.com/favecode/reflect-core/graph/generated"
+	graph "github.com/favecode/reflect-core/graph/resolver"
 )
 
 const defaultPort = "8080"
