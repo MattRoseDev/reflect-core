@@ -5,15 +5,15 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/favecode/reflect-core/graph/model"
+	"github.com/favecode/reflect-core/service"
 )
 
 func (r *mutationResolver) Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutput, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.Register(ctx, input)
 }
 
 func (r *queryResolver) Login(ctx context.Context, input *model.LoginInput) (*model.AuthOutput, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.Login(ctx, input)
 }
