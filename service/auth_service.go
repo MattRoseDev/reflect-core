@@ -4,11 +4,13 @@ import (
 	"context"
 
 	"github.com/favecode/reflect-core/graph/model"
+	"github.com/favecode/reflect-core/pkg/util"
 )
 
 func Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutput, error) {
+	token, _ := util.GenerateToken("1", input.Username)
 	return &model.AuthOutput{
-		Token: "token",
+		Token: token,
 		User: &model.User{
 			Username: input.Username,
 			Password: input.Password,
