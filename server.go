@@ -9,11 +9,13 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/favecode/reflect-core/graph/generated"
 	graph "github.com/favecode/reflect-core/graph/resolver"
+	"github.com/favecode/reflect-core/pkg/db"
 )
 
 const defaultPort = "8080"
 
 func main() {
+	db.Connect()
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
