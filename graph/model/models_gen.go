@@ -55,7 +55,6 @@ type RegisterInput struct {
 type User struct {
 	ID        string     `json:"id"`
 	Username  string     `json:"username"`
-	Password  string     `json:"password"`
 	Email     string     `json:"email"`
 	Fullname  *string    `json:"fullname"`
 	Bio       *string    `json:"bio"`
