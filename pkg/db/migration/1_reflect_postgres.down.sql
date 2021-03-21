@@ -1,0 +1,10 @@
+ALTER TABLE "password" DROP CONSTRAINT IF EXISTS "password_fk0";
+
+ALTER TABLE "post" DROP CONSTRAINT IF EXISTS "post_fk0";
+
+DROP TABLE IF EXISTS "user";
+
+DROP TABLE IF EXISTS "password";
+
+DROP TABLE IF EXISTS "post";
+

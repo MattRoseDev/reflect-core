@@ -8,6 +8,7 @@ import (
 )
 
 func Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutput, error) {
+	// TODO: Fix the id param
 	token, _ := util.GenerateToken("1", input.Username)
 	return &model.AuthOutput{
 		Token: token,
