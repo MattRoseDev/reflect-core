@@ -42,10 +42,25 @@ func Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutpu
 }
 
 func Login(ctx context.Context, input *model.LoginInput) (*model.AuthOutput, error) {
-	return &model.AuthOutput{
-		Token: "token",
-		User: &model.User{
-			Username: input.Username,
-		},
-	}, nil
+	db := db.Connect()
+	user := new(entity.User)
+	password := new(entity.Password)
+	db.Model(user).Where("username = ?", input.Username).Select()	
+	db.Model(password).Where("user_id = ?", user.Id).Select()	
+	err := bcrypt.CompareHashAndPassword([]byte(password.Password), []byte(input.Password)) 
+	if (err == nil) {
+		token, _ := util.GenerateToken(user.Id, user.Username)
+		return &model.AuthOutput{
+			Token: token,
+			User: &model.User{
+				ID: user.Id,
+				Username: user.Username,
+				Email: user.Email,
+				Fullname: user.Fullname,
+				CreatedAt: &user.CreatedAt,
+				UpdatedAt: &user.UpdatedAt,
+			},
+		}, nil
+	}
+	return nil, err
 }
