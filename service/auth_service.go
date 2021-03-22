@@ -8,6 +8,7 @@ import (
 	"github.com/favecode/reflect-core/pkg/db"
 	"github.com/favecode/reflect-core/pkg/util"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutput, error) {
@@ -19,9 +20,11 @@ func Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutpu
 		Admin: false,
 	}
 	db.Model(user).Returning("*").Insert()
+	bytes, _ := bcrypt.GenerateFromPassword([]byte(input.Password), 14)
+	hashedPassword := string(bytes)
 	password := &entity.Password{
 		UserId: user.Id,
-		Password: input.Password,
+		Password: hashedPassword,
 	}	
 	db.Model(password).Insert()
 	token, _ := util.GenerateToken(id, input.Username)
