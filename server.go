@@ -14,8 +14,11 @@ import (
 
 const defaultPort = "8080"
 
-func main() {
+func init() {
 	db.Connect()
+}
+
+func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort

@@ -7,19 +7,13 @@ import (
 	"github.com/go-pg/pg"
 )
 
-var db *pg.DB
-
-func Connect(){ 
+func Connect() (*pg.DB){ 
 	db := pg.Connect(&pg.Options{
-		Addr: setting.Get().Database.Host  + ":" + setting.Get().Database.Name,
+		Addr: setting.Get().Database.Host  + ":" + fmt.Sprint(setting.Get().Database.Port),
 		User: setting.Get().Database.User,
 		Password: setting.Get().Database.Password, 
-		Database: setting.Get().Database.Name, 
+		Database: setting.Get().Database.Name,
 	})
-	
 	fmt.Println("Connected to",db.Options().Addr)
-}
-
-func GetDB() (*pg.DB) {
 	return db
 }
