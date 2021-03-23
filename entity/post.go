@@ -6,6 +6,7 @@ type Post struct {
 	tableName struct{}   `sql:"post"`
 	Id        string     `pg:"id"`
 	UserId string     `pg:"userId"`
+	Link string     `pg:"link"`
 	Content string       `pg:"content"`
 	CreatedAt time.Time `pg:"created_at"`
 	UpdatedAt time.Time `pg:"updated_at"`

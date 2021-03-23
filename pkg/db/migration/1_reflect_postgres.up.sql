@@ -1,4 +1,4 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp/uuid_generate_v4";
 
 CREATE TABLE "user" (
 	"id" uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -35,6 +35,7 @@ CREATE TABLE "post" (
 	"id" uuid NOT NULL DEFAULT uuid_generate_v4(),
 	"user_id" uuid NOT NULL,
 	"content" TEXT NOT NULL,
+	"link" varchar(12) NOT NULL,
 	"created_at" DATE NOT NULL DEFAULT (now()),
 	"updated_at" DATE NOT NULL DEFAULT (now()),
 	"deleted_at" DATE,

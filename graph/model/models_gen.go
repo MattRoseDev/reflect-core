@@ -40,6 +40,7 @@ type LoginInput struct {
 type Post struct {
 	ID        string     `json:"id"`
 	Content   string     `json:"content"`
+	Link      string     `json:"link"`
 	User      *User      `json:"user"`
 	CreatedAt *time.Time `json:"createdAt"`
 	UpdatedAt *time.Time `json:"updatedAt"`
