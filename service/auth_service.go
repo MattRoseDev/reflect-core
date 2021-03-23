@@ -8,6 +8,7 @@ import (
 	"github.com/favecode/reflect-core/pkg/db"
 	"github.com/favecode/reflect-core/pkg/util"
 	"github.com/google/uuid"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -17,8 +18,17 @@ func Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutpu
 	user := &entity.User{
 		Username: input.Username,
 		Email: input.Email,
-		Admin: false,
 	}
+	hasUser := &entity.User{}
+	db.Model(hasUser).Where("username = ?", input.Username).WhereOr("email = ?", input.Email).Returning("*").Select()	
+	if (hasUser.Username == input.Username) {
+		return nil, gqlerror.Errorf("Username has already taken")
+	}
+
+	if (hasUser.Email == input.Email) {
+		return nil, gqlerror.Errorf("Email has already taken")
+	}
+	
 	db.Model(user).Returning("*").Insert()
 	bytes, _ := bcrypt.GenerateFromPassword([]byte(input.Password), 14)
 	hashedPassword := string(bytes)
@@ -45,7 +55,12 @@ func Login(ctx context.Context, input *model.LoginInput) (*model.AuthOutput, err
 	db := db.Connect()
 	user := new(entity.User)
 	password := new(entity.Password)
-	db.Model(user).Where("username = ?", input.Username).Select()	
+
+	db.Model(user).Where("username = ?", input.Username).Select()
+	if (len(user.Id) <= 0) {
+		return nil, gqlerror.Errorf("Username or Password is not valid")
+	}
+
 	db.Model(password).Where("user_id = ?", user.Id).Select()	
 	err := bcrypt.CompareHashAndPassword([]byte(password.Password), []byte(input.Password)) 
 	if (err == nil) {
@@ -62,5 +77,5 @@ func Login(ctx context.Context, input *model.LoginInput) (*model.AuthOutput, err
 			},
 		}, nil
 	}
-	return nil, err
+	return nil, gqlerror.Errorf("Username or Password is not valid")
 }
