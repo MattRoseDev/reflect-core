@@ -7,14 +7,12 @@ import (
 	"github.com/favecode/reflect-core/graph/model"
 	"github.com/favecode/reflect-core/pkg/db"
 	"github.com/favecode/reflect-core/pkg/util"
-	"github.com/google/uuid"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutput, error) {
 	db := db.Connect()
-	id := uuid.NewString()
 	user := &entity.User{
 		Username: input.Username,
 		Email: input.Email,
@@ -37,7 +35,7 @@ func Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutpu
 		Password: hashedPassword,
 	}	
 	db.Model(password).Insert()
-	token, _ := util.GenerateToken(id, input.Username)
+	token, _ := util.GenerateToken(user.Id, input.Username)
 	return &model.AuthOutput{
 		Token: token,
 		User: &model.User{
