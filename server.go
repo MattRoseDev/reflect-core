@@ -1,34 +1,47 @@
 package main
 
 import (
-	"log"
-	"net/http"
-	"os"
+	"context"
+
+	"github.com/gin-gonic/gin"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/favecode/reflect-core/graph/generated"
 	graph "github.com/favecode/reflect-core/graph/resolver"
-	"github.com/favecode/reflect-core/pkg/db"
 )
 
-const defaultPort = "8080"
+// Defining the Graphql handler
+func graphqlHandler() gin.HandlerFunc {
+	h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 
-func init() {
-	db.Connect()
+	return func(c *gin.Context) {
+		h.ServeHTTP(c.Writer, c.Request)
+	}
+}
+
+func GinContextToContextMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx := context.WithValue(c.Request.Context(), "header", c)
+		c.Request = c.Request.WithContext(ctx)
+		c.Next()
+	}
+}
+
+// Defining the Playground handler
+func playgroundHandler() gin.HandlerFunc {
+	h := playground.Handler("GraphQL", "/query")
+
+	return func(c *gin.Context) {
+		h.ServeHTTP(c.Writer, c.Request)
+	}
 }
 
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultPort
-	}
-
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
-
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
-
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	// Setting up Gin
+	r := gin.Default()
+	r.Use(GinContextToContextMiddleware())
+	r.POST("/query", graphqlHandler())
+	r.GET("/", playgroundHandler())
+	r.Run()
 }

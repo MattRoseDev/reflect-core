@@ -6,7 +6,7 @@ import (
 	"github.com/favecode/reflect-core/entity"
 	"github.com/favecode/reflect-core/graph/model"
 	"github.com/favecode/reflect-core/pkg/db"
-	"github.com/favecode/reflect-core/pkg/util"
+	jwt "github.com/favecode/reflect-core/pkg/util"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -35,7 +35,7 @@ func Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutpu
 		Password: hashedPassword,
 	}	
 	db.Model(password).Insert()
-	token, _ := util.GenerateToken(user.Id, input.Username)
+	token, _ := jwt.GenerateToken(user.Id, input.Username)
 	return &model.AuthOutput{
 		Token: token,
 		User: &model.User{
@@ -62,7 +62,7 @@ func Login(ctx context.Context, input *model.LoginInput) (*model.AuthOutput, err
 	db.Model(password).Where("user_id = ?", user.Id).Select()	
 	err := bcrypt.CompareHashAndPassword([]byte(password.Password), []byte(input.Password)) 
 	if (err == nil) {
-		token, _ := util.GenerateToken(user.Id, user.Username)
+		token, _ := jwt.GenerateToken(user.Id, user.Username)
 		return &model.AuthOutput{
 			Token: token,
 			User: &model.User{
