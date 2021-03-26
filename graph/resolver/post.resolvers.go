@@ -9,10 +9,11 @@ import (
 
 	"github.com/favecode/reflect-core/graph/generated"
 	"github.com/favecode/reflect-core/graph/model"
+	"github.com/favecode/reflect-core/service"
 )
 
 func (r *mutationResolver) AddPost(ctx context.Context, input *model.AddPostInput) (*model.Post, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.AddPost(ctx, input)
 }
 
 func (r *mutationResolver) EditPost(ctx context.Context, input *model.EditPostInput) (*model.Post, error) {
