@@ -21,7 +21,7 @@ func AddPost(ctx context.Context, input *model.AddPostInput) (*model.Post, error
 	db.Model(isUser).Where("id = ?", userData.Id).Returning("*").Select()
 	
 	if (len(isUser.Id) <= 0) {
-		return nil, gqlerror.Errorf("UserId not valid")
+		return nil, gqlerror.Errorf("UserId is not valid")
 	}
 	post := &entity.Post{
 		UserId: isUser.Id,
@@ -40,6 +40,34 @@ func AddPost(ctx context.Context, input *model.AddPostInput) (*model.Post, error
 			Fullname:isUser.Fullname,
 			CreatedAt: &isUser.CreatedAt,
 			UpdatedAt: &isUser.UpdatedAt,
+		},
+		Content: post.Content,
+		Link: post.Link,
+		CreatedAt: &post.CreatedAt,
+		UpdatedAt: &post.UpdatedAt,	
+	}, nil
+}
+
+func GetPost(ctx context.Context, input *model.GetPostInput) (*model.Post, error) {
+	db := db.Connect()
+	post := &entity.Post{}
+	user := &entity.User{}
+	db.Model(post).Where("id = ?", input.PostID).Returning("*").Select()
+	db.Model(user).Where("id = ?", input.PostID).Returning("*").Select()
+
+	if(len(post.Id) <= 0) {
+		return nil, gqlerror.Errorf("PostId is not valid")	
+	}
+
+	return &model.Post{
+		ID: post.Id,
+		User: &model.User{
+			ID: user.Id,
+			Username: user.Username,
+			Email: user.Email,
+			Fullname:user.Fullname,
+			CreatedAt: &user.CreatedAt,
+			UpdatedAt: &user.UpdatedAt,
 		},
 		Content: post.Content,
 		Link: post.Link,

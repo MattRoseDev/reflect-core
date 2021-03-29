@@ -25,7 +25,7 @@ func (r *mutationResolver) DeletePost(ctx context.Context, input *model.DeletePo
 }
 
 func (r *queryResolver) GetPost(ctx context.Context, input *model.GetPostInput) (*model.Post, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.GetPost(ctx, input)
 }
 
 func (r *queryResolver) GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInput) ([]*model.Post, error) {
