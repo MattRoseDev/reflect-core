@@ -87,7 +87,7 @@ func GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInpu
 	user := &entity.User{}
 	db.Model(user).Where("username = ?", input.Username).Returning("*").Select()
 
-	db.Model(posts).Where("user_id = ?", user.Id).Returning("*").Select()
+	db.Model(posts).Where("user_id = ?", user.Id).Order("created_at DESC").Returning("*").Select()
 
 	result := make([]*model.Post, 0)
 
