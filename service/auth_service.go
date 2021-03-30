@@ -18,7 +18,7 @@ func Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutpu
 		Email: input.Email,
 	}
 	isUser := &entity.User{}
-	db.Model(isUser).Where("username = ?", input.Username).WhereOr("email = ?", input.Email).Returning("*").Select()	
+	db.Model(isUser).Where("username = ?", input.Username).WhereOr("email = ?", input.Email).Where("deleted_at is ?", nil).Returning("*").Select()	
 	if (isUser.Username == input.Username) {
 		return nil, gqlerror.Errorf("Username has already taken")
 	}
@@ -55,12 +55,12 @@ func Login(ctx context.Context, input *model.LoginInput) (*model.AuthOutput, err
 	user := new(entity.User)
 	password := new(entity.Password)
 
-	db.Model(user).Where("username = ?", input.Username).Select()
+	db.Model(user).Where("username = ?", input.Username).Where("deleted_at is ?", nil).Select()
 	if (len(user.Id) <= 0) {
 		return nil, gqlerror.Errorf("Username or Password is not valid")
 	}
 
-	db.Model(password).Where("user_id = ?", user.Id).Select()	
+	db.Model(password).Where("user_id = ?", user.Id).Where("deleted_at is ?", nil).Select()	
 	err := bcrypt.CompareHashAndPassword([]byte(password.Password), []byte(input.Password)) 
 	if (err == nil) {
 		token, _ := util.GenerateToken(user.Id, user.Username)

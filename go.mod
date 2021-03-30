@@ -7,7 +7,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-pg/pg v8.0.7+incompatible
-	github.com/go-pg/pg/v10 v10.8.0 // indirect
+	github.com/go-pg/pg/v10 v10.8.0
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/google/uuid v1.2.0
 	github.com/spf13/viper v1.7.1

@@ -55,8 +55,8 @@ func GetPost(ctx context.Context, input *model.GetPostInput) (*model.Post, error
 	db := db.Connect()
 	post := &entity.Post{}
 	user := &entity.User{}
-	db.Model(post).Where("id = ?", input.PostID).Returning("*").Select()
-	db.Model(user).Where("id = ?", input.PostID).Returning("*").Select()
+	db.Model(post).Where("id = ?", input.PostID).Where("deleted_at is ?", nil).Returning("*").Select()
+	db.Model(user).Where("id = ?", input.PostID).Where("deleted_at is ?", nil).Returning("*").Select()
 
 	if(len(post.Id) <= 0) {
 		return nil, gqlerror.Errorf("PostId is not valid")	
@@ -85,9 +85,9 @@ func GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInpu
 	db := db.Connect()
 	posts := &[]entity.Post{}
 	user := &entity.User{}
-	db.Model(user).Where("username = ?", input.Username).Returning("*").Select()
+	db.Model(user).Where("username = ?", input.Username).Where("deleted_at is ?", nil).Returning("*").Select()
 
-	db.Model(posts).Where("user_id = ?", user.Id).Order("created_at DESC").Returning("*").Select()
+	db.Model(posts).Where("user_id = ?", user.Id).Where("deleted_at is ?", nil).Order("created_at DESC").Returning("*").Select()
 
 	result := make([]*model.Post, 0)
 
@@ -122,7 +122,7 @@ func DeletePost(ctx context.Context, input *model.DeletePostInput) (*model.Post,
 
 	isUser := &entity.User{}
 
-	db.Model(isUser).Where("id = ?", userData.Id).Returning("*").Select()
+	db.Model(isUser).Where("id = ?", userData.Id).Where("deleted_at is ?", nil).Returning("*").Select()
 
 	if (len(isUser.Id) <= 0) {
 		return nil, gqlerror.Errorf("UserId is not valid")
