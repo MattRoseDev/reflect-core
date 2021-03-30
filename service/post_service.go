@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/favecode/reflect-core/entity"
 	"github.com/favecode/reflect-core/graph/model"
@@ -40,11 +41,13 @@ func AddPost(ctx context.Context, input *model.AddPostInput) (*model.Post, error
 			Fullname:isUser.Fullname,
 			CreatedAt: &isUser.CreatedAt,
 			UpdatedAt: &isUser.UpdatedAt,
+			DeletedAt: isUser.DeletedAt,
 		},
 		Content: post.Content,
 		Link: post.Link,
 		CreatedAt: &post.CreatedAt,
 		UpdatedAt: &post.UpdatedAt,	
+		DeletedAt: post.DeletedAt,	
 	}, nil
 }
 
@@ -68,11 +71,13 @@ func GetPost(ctx context.Context, input *model.GetPostInput) (*model.Post, error
 			Fullname:user.Fullname,
 			CreatedAt: &user.CreatedAt,
 			UpdatedAt: &user.UpdatedAt,
+			DeletedAt: user.DeletedAt,
 		},
 		Content: post.Content,
 		Link: post.Link,
 		CreatedAt: &post.CreatedAt,
 		UpdatedAt: &post.UpdatedAt,	
+		DeletedAt: post.DeletedAt,	
 	}, nil
 }
 
@@ -96,13 +101,57 @@ func GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInpu
 				Fullname:user.Fullname,
 				CreatedAt: &user.CreatedAt,
 				UpdatedAt: &user.UpdatedAt,
+				DeletedAt: user.DeletedAt,
 			},
 			Content: post.Content,
 			Link: post.Link,
 			CreatedAt: &post.CreatedAt,
 			UpdatedAt: &post.UpdatedAt,		
+			DeletedAt: post.DeletedAt,		
 		})
 	}	
 
 	return result , nil
+}
+
+
+func DeletePost(ctx context.Context, input *model.DeletePostInput) (*model.Post, error) {
+	db := db.Connect()
+	token, _ := util.GetDataFromHeaderWithKey(ctx, "token")
+	userData, _ := util.ParseToken(token)
+
+	isUser := &entity.User{}
+
+	db.Model(isUser).Where("id = ?", userData.Id).Returning("*").Select()
+
+	if (len(isUser.Id) <= 0) {
+		return nil, gqlerror.Errorf("UserId is not valid")
+	}
+
+	DeletedAt := time.Now()
+
+	post := &entity.Post{
+		Id: input.PostID,
+		DeletedAt: &DeletedAt,
+	}
+
+	db.Model(post).Set("deleted_at = ?deleted_at").Where("id = ?id").Returning("*").Update()
+
+	return &model.Post{
+		ID: post.Id,
+		User: &model.User{
+			ID: isUser.Id,
+			Username: isUser.Username,
+			Email: isUser.Email,
+			Fullname:isUser.Fullname,
+			CreatedAt: &isUser.CreatedAt,
+			UpdatedAt: &isUser.UpdatedAt,
+			DeletedAt: isUser.DeletedAt,
+		},
+		Content: post.Content,
+		Link: post.Link,
+		CreatedAt: &post.CreatedAt,
+		UpdatedAt: &post.UpdatedAt,	
+		DeletedAt: post.DeletedAt,	
+	} , nil
 }

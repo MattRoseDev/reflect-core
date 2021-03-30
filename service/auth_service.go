@@ -45,6 +45,7 @@ func Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutpu
 			Fullname: user.Fullname,
 			CreatedAt: &user.CreatedAt,
 			UpdatedAt: &user.UpdatedAt,
+			DeletedAt: user.DeletedAt,
 		},
 	}, nil
 }
@@ -72,6 +73,7 @@ func Login(ctx context.Context, input *model.LoginInput) (*model.AuthOutput, err
 				Fullname: user.Fullname,
 				CreatedAt: &user.CreatedAt,
 				UpdatedAt: &user.UpdatedAt,
+				DeletedAt: user.DeletedAt,
 			},
 		}, nil
 	}

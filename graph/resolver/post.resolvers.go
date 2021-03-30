@@ -21,7 +21,7 @@ func (r *mutationResolver) EditPost(ctx context.Context, input *model.EditPostIn
 }
 
 func (r *mutationResolver) DeletePost(ctx context.Context, input *model.DeletePostInput) (*model.Post, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.DeletePost(ctx, input)
 }
 
 func (r *queryResolver) GetPost(ctx context.Context, input *model.GetPostInput) (*model.Post, error) {
