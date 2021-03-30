@@ -75,3 +75,34 @@ func GetPost(ctx context.Context, input *model.GetPostInput) (*model.Post, error
 		UpdatedAt: &post.UpdatedAt,	
 	}, nil
 }
+
+func GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInput) ([]*model.Post, error) {
+	db := db.Connect()
+	posts := &[]entity.Post{}
+	user := &entity.User{}
+	db.Model(user).Where("username = ?", input.Username).Returning("*").Select()
+
+	db.Model(posts).Where("user_id = ?", user.Id).Returning("*").Select()
+
+	result := make([]*model.Post, 0)
+
+	for _, post := range *posts {
+		result = append(result, &model.Post{
+			ID: post.Id,
+			User: &model.User{
+				ID: user.Id,
+				Username: user.Username,
+				Email: user.Email,
+				Fullname:user.Fullname,
+				CreatedAt: &user.CreatedAt,
+				UpdatedAt: &user.UpdatedAt,
+			},
+			Content: post.Content,
+			Link: post.Link,
+			CreatedAt: &post.CreatedAt,
+			UpdatedAt: &post.UpdatedAt,		
+		})
+	}	
+
+	return result , nil
+}

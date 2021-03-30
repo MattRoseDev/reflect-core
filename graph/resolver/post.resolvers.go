@@ -29,7 +29,7 @@ func (r *queryResolver) GetPost(ctx context.Context, input *model.GetPostInput) 
 }
 
 func (r *queryResolver) GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInput) ([]*model.Post, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.GetPostsByUsername(ctx, input)
 }
 
 // Mutation returns generated.MutationResolver implementation.
