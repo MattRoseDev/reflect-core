@@ -5,7 +5,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/favecode/reflect-core/graph/generated"
 	"github.com/favecode/reflect-core/graph/model"
@@ -17,7 +16,7 @@ func (r *mutationResolver) AddPost(ctx context.Context, input *model.AddPostInpu
 }
 
 func (r *mutationResolver) EditPost(ctx context.Context, input *model.EditPostInput) (*model.Post, error) {
-	panic(fmt.Errorf("not implemented"))
+	return service.EditPost(ctx, input)
 }
 
 func (r *mutationResolver) DeletePost(ctx context.Context, input *model.DeletePostInput) (*model.Post, error) {

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/favecode/reflect-core/entity"
@@ -39,14 +40,14 @@ func AddPost(ctx context.Context, input *model.AddPostInput) (*model.Post, error
 			Username: isUser.Username,
 			Email: isUser.Email,
 			Fullname:isUser.Fullname,
-			CreatedAt: &isUser.CreatedAt,
-			UpdatedAt: &isUser.UpdatedAt,
+			CreatedAt: isUser.CreatedAt,
+			UpdatedAt: isUser.UpdatedAt,
 			DeletedAt: isUser.DeletedAt,
 		},
 		Content: post.Content,
 		Link: post.Link,
-		CreatedAt: &post.CreatedAt,
-		UpdatedAt: &post.UpdatedAt,	
+		CreatedAt: post.CreatedAt,
+		UpdatedAt: post.UpdatedAt,	
 		DeletedAt: post.DeletedAt,	
 	}, nil
 }
@@ -69,14 +70,14 @@ func GetPost(ctx context.Context, input *model.GetPostInput) (*model.Post, error
 			Username: user.Username,
 			Email: user.Email,
 			Fullname:user.Fullname,
-			CreatedAt: &user.CreatedAt,
-			UpdatedAt: &user.UpdatedAt,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
 			DeletedAt: user.DeletedAt,
 		},
 		Content: post.Content,
 		Link: post.Link,
-		CreatedAt: &post.CreatedAt,
-		UpdatedAt: &post.UpdatedAt,	
+		CreatedAt: post.CreatedAt,
+		UpdatedAt: post.UpdatedAt,	
 		DeletedAt: post.DeletedAt,	
 	}, nil
 }
@@ -87,11 +88,12 @@ func GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInpu
 	user := &entity.User{}
 	db.Model(user).Where("username = ?", input.Username).Where("deleted_at is ?", nil).Returning("*").Select()
 
-	db.Model(posts).Where("user_id = ?", user.Id).Where("deleted_at is ?", nil).Order("created_at DESC").Returning("*").Select()
+	db.Model(posts).Where("user_id = ?", user.Id).Order("created_at DESC").Returning("*").Select()
 
 	result := make([]*model.Post, 0)
 
 	for _, post := range *posts {
+		fmt.Println(post)
 		result = append(result, &model.Post{
 			ID: post.Id,
 			User: &model.User{
@@ -99,17 +101,19 @@ func GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInpu
 				Username: user.Username,
 				Email: user.Email,
 				Fullname:user.Fullname,
-				CreatedAt: &user.CreatedAt,
-				UpdatedAt: &user.UpdatedAt,
+				CreatedAt: user.CreatedAt,
+				UpdatedAt: user.UpdatedAt,
 				DeletedAt: user.DeletedAt,
 			},
 			Content: post.Content,
 			Link: post.Link,
-			CreatedAt: &post.CreatedAt,
-			UpdatedAt: &post.UpdatedAt,		
+			CreatedAt: post.CreatedAt,
+			UpdatedAt: post.UpdatedAt,		
 			DeletedAt: post.DeletedAt,		
 		})
 	}	
+
+	fmt.Println(result[0])
 
 	return result , nil
 }
@@ -144,14 +148,57 @@ func DeletePost(ctx context.Context, input *model.DeletePostInput) (*model.Post,
 			Username: isUser.Username,
 			Email: isUser.Email,
 			Fullname:isUser.Fullname,
-			CreatedAt: &isUser.CreatedAt,
-			UpdatedAt: &isUser.UpdatedAt,
+			CreatedAt: isUser.CreatedAt,
+			UpdatedAt: isUser.UpdatedAt,
 			DeletedAt: isUser.DeletedAt,
 		},
 		Content: post.Content,
 		Link: post.Link,
-		CreatedAt: &post.CreatedAt,
-		UpdatedAt: &post.UpdatedAt,	
+		CreatedAt: post.CreatedAt,
+		UpdatedAt: post.UpdatedAt,	
+		DeletedAt: post.DeletedAt,	
+	} , nil
+}
+
+
+func EditPost(ctx context.Context, input *model.EditPostInput) (*model.Post, error) {
+	db := db.Connect()
+	token, _ := util.GetDataFromHeaderWithKey(ctx, "token")
+	userData, _ := util.ParseToken(token)
+
+	isUser := &entity.User{}
+
+	db.Model(isUser).Where("id = ?", userData.Id).Where("deleted_at is ?", nil).Returning("*").Select()
+
+	if (len(isUser.Id) <= 0) {
+		return nil, gqlerror.Errorf("UserId is not valid")
+	}
+
+	UpdatedAt := time.Now()
+
+	post := &entity.Post{
+		Id: input.PostID,
+		Content: input.Content,
+		UpdatedAt: &UpdatedAt,
+	}
+
+	db.Model(post).Set("updated_at = ?updated_at").Set("content = ?content").Where("id = ?id").Returning("*").Update()
+
+	return &model.Post{
+		ID: post.Id,
+		User: &model.User{
+			ID: isUser.Id,
+			Username: isUser.Username,
+			Email: isUser.Email,
+			Fullname:isUser.Fullname,
+			CreatedAt: isUser.CreatedAt,
+			UpdatedAt: isUser.UpdatedAt,
+			DeletedAt: isUser.DeletedAt,
+		},
+		Content: post.Content,
+		Link: post.Link,
+		CreatedAt: post.CreatedAt,
+		UpdatedAt: post.UpdatedAt,	
 		DeletedAt: post.DeletedAt,	
 	} , nil
 }
