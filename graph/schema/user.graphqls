@@ -9,3 +9,7 @@ type User {
   updatedAt: Time
   deletedAt: Time
 }
+
+extend type Query {
+  getUserInfo: User!
+}

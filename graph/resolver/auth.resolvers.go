@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 
+	"github.com/favecode/reflect-core/graph/generated"
 	"github.com/favecode/reflect-core/graph/model"
 	"github.com/favecode/reflect-core/service"
 )
@@ -17,3 +18,12 @@ func (r *mutationResolver) Register(ctx context.Context, input *model.RegisterIn
 func (r *queryResolver) Login(ctx context.Context, input *model.LoginInput) (*model.AuthOutput, error) {
 	return service.Login(ctx, input)
 }
+
+// Mutation returns generated.MutationResolver implementation.
+func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
+
+// Query returns generated.QueryResolver implementation.
+func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
+
+type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }

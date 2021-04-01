@@ -6,7 +6,6 @@ package graph
 import (
 	"context"
 
-	"github.com/favecode/reflect-core/graph/generated"
 	"github.com/favecode/reflect-core/graph/model"
 	"github.com/favecode/reflect-core/service"
 )
@@ -30,12 +29,3 @@ func (r *queryResolver) GetPost(ctx context.Context, input *model.GetPostInput) 
 func (r *queryResolver) GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInput) ([]*model.Post, error) {
 	return service.GetPostsByUsername(ctx, input)
 }
-
-// Mutation returns generated.MutationResolver implementation.
-func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
-
-// Query returns generated.QueryResolver implementation.
-func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
-
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }

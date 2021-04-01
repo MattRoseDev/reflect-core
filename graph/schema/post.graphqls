@@ -29,12 +29,12 @@ input GetPostsByUsernameInput {
   username: String!
 }
 
-type Query {
+extend type Query {
   getPost(input: GetPostInput): Post!
   getPostsByUsername(input: GetPostsByUsernameInput): [Post!]!
 }
 
-type Mutation {
+extend type Mutation {
   addPost(input: AddPostInput): Post!
   editPost(input: EditPostInput): Post!
   deletePost(input: DeletePostInput): Post!

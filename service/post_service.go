@@ -12,7 +12,6 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
-
 func AddPost(ctx context.Context, input *model.AddPostInput) (*model.Post, error) {
 	db := db.Connect()
 	token, _ := util.GetDataFromHeaderWithKey(ctx, "token")
@@ -118,7 +117,6 @@ func GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInpu
 	return result , nil
 }
 
-
 func DeletePost(ctx context.Context, input *model.DeletePostInput) (*model.Post, error) {
 	db := db.Connect()
 	token, _ := util.GetDataFromHeaderWithKey(ctx, "token")
@@ -159,7 +157,6 @@ func DeletePost(ctx context.Context, input *model.DeletePostInput) (*model.Post,
 		DeletedAt: post.DeletedAt,	
 	} , nil
 }
-
 
 func EditPost(ctx context.Context, input *model.EditPostInput) (*model.Post, error) {
 	db := db.Connect()

@@ -11,11 +11,11 @@ input RegisterInput {
   password: String!
 }
 
-extend type Query {
+type Query {
   login(input: LoginInput): AuthOutput!
 }
 
-extend type Mutation {
+type Mutation {
   register(input: RegisterInput): AuthOutput!
 }
 
