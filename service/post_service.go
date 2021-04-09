@@ -14,16 +14,11 @@ import (
 
 func AddPost(ctx context.Context, input *model.AddPostInput) (*model.Post, error) {
 	db := db.Connect()
-	token, _ := util.GetDataFromHeaderWithKey(ctx, "token")
-	userData, _ := util.ParseToken(token)
-
-	isUser := &entity.User{}
-
-	db.Model(isUser).Where("id = ?", userData.Id).Returning("*").Select()
-	
-	if (len(isUser.Id) <= 0) {
-		return nil, gqlerror.Errorf("UserId is not valid")
+	isUser, err := util.ValidateUserToken(ctx)	
+	if (err != nil) {
+		return nil, gqlerror.Errorf(err.Error())
 	}
+
 	post := &entity.Post{
 		UserId: isUser.Id,
 		Content: input.Content,
@@ -53,6 +48,11 @@ func AddPost(ctx context.Context, input *model.AddPostInput) (*model.Post, error
 
 func GetPost(ctx context.Context, input *model.GetPostInput) (*model.Post, error) {
 	db := db.Connect()
+	_, err := util.ValidateUserToken(ctx)	
+	if (err != nil) {
+		return nil, gqlerror.Errorf(err.Error())
+	}
+
 	post := &entity.Post{}
 	user := &entity.User{}
 	db.Model(post).Where("id = ?", input.PostID).Where("deleted_at is ?", nil).Returning("*").Select()
@@ -83,6 +83,11 @@ func GetPost(ctx context.Context, input *model.GetPostInput) (*model.Post, error
 
 func GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInput) ([]*model.Post, error) {
 	db := db.Connect()
+	_, err := util.ValidateUserToken(ctx)	
+	if (err != nil) {
+		return nil, gqlerror.Errorf(err.Error())
+	}
+
 	posts := &[]entity.Post{}
 	user := &entity.User{}
 	db.Model(user).Where("username = ?", input.Username).Where("deleted_at is ?", nil).Returning("*").Select()
@@ -119,24 +124,24 @@ func GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInpu
 
 func DeletePost(ctx context.Context, input *model.DeletePostInput) (*model.Post, error) {
 	db := db.Connect()
-	token, _ := util.GetDataFromHeaderWithKey(ctx, "token")
-	userData, _ := util.ParseToken(token)
-
-	isUser := &entity.User{}
-
-	db.Model(isUser).Where("id = ?", userData.Id).Where("deleted_at is ?", nil).Returning("*").Select()
-
-	if (len(isUser.Id) <= 0) {
-		return nil, gqlerror.Errorf("UserId is not valid")
+	isUser, err := util.ValidateUserToken(ctx)	
+	if (err != nil) {
+		return nil, gqlerror.Errorf(err.Error())
 	}
 
+	isPost := new(entity.Post)
+
+	db.Model(isPost).Where("id = ?", input.PostID).Returning("*").Select()
+	if (len(isPost.Id) <= 0) {
+		return nil, gqlerror.Errorf("Post not found")
+	}
+	
 	DeletedAt := time.Now()
 
 	post := &entity.Post{
 		Id: input.PostID,
 		DeletedAt: &DeletedAt,
 	}
-
 	db.Model(post).Set("deleted_at = ?deleted_at").Where("id = ?id").Returning("*").Update()
 
 	return &model.Post{
@@ -160,26 +165,17 @@ func DeletePost(ctx context.Context, input *model.DeletePostInput) (*model.Post,
 
 func EditPost(ctx context.Context, input *model.EditPostInput) (*model.Post, error) {
 	db := db.Connect()
-	token, _ := util.GetDataFromHeaderWithKey(ctx, "token")
-	userData, _ := util.ParseToken(token)
-
-	isUser := &entity.User{}
-
-	db.Model(isUser).Where("id = ?", userData.Id).Where("deleted_at is ?", nil).Returning("*").Select()
-
-	if (len(isUser.Id) <= 0) {
-		return nil, gqlerror.Errorf("UserId is not valid")
+	isUser, err := util.ValidateUserToken(ctx)	
+	if (err != nil) {
+		return nil, gqlerror.Errorf(err.Error())
 	}
-
-	UpdatedAt := time.Now()
 
 	post := &entity.Post{
 		Id: input.PostID,
 		Content: input.Content,
-		UpdatedAt: &UpdatedAt,
 	}
 
-	db.Model(post).Set("updated_at = ?updated_at").Set("content = ?content").Where("id = ?id").Returning("*").Update()
+	db.Model(post).Set("content = ?content").Where("id = ?id").Returning("*").Update()
 
 	return &model.Post{
 		ID: post.Id,
