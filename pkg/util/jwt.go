@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/favecode/reflect-core/entity"
+	"github.com/favecode/reflect-core/pkg/db"
 	"github.com/gin-gonic/gin"
 )
 
@@ -68,4 +70,24 @@ func GinContextFromContext(ctx context.Context) (*gin.Context, error) {
 func GetDataFromHeaderWithKey(ctx context.Context, key string) (string, error) {
 	gc, _ := GinContextFromContext(ctx)
 	return gc.Request.Header.Get(key), nil
+}
+
+func ValidateUserToken(ctx context.Context) (*entity.User, error) {
+	db := db.Connect()
+	token, _ := GetDataFromHeaderWithKey(ctx, "token")
+	userData, _ := ParseToken(token)
+
+	if (userData == nil) {
+		return nil, fmt.Errorf("token is not valid")
+	}
+
+	isUser := &entity.User{}
+
+	db.Model(isUser).Where("id = ?", userData.Id).Where("deleted_at is ?", nil).Returning("*").Select()
+
+	if (len(isUser.Id) <= 0) {
+		return nil, fmt.Errorf("UserId is not valid")
+	}
+
+	return isUser, nil
 }
