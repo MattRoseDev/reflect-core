@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -41,6 +42,9 @@ func main() {
 	// Setting up Gin
 	r := gin.Default()
 	r.Use(GinContextToContextMiddleware())
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://localhost:3000"}
+	r.Use(cors.New(config))
 	r.POST("/query", graphqlHandler())
 	r.GET("/", playgroundHandler())
 	r.Run()
