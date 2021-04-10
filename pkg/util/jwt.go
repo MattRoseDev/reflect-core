@@ -73,7 +73,7 @@ func GetDataFromHeaderWithKey(ctx context.Context, key string) (string, error) {
 }
 
 func ValidateUserToken(ctx context.Context) (*entity.User, error) {
-	db := db.Connect()
+	db := db.DB
 	token, _ := GetDataFromHeaderWithKey(ctx, "token")
 	userData, _ := ParseToken(token)
 

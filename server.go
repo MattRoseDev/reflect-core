@@ -10,6 +10,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/favecode/reflect-core/graph/generated"
 	graph "github.com/favecode/reflect-core/graph/resolver"
+	"github.com/favecode/reflect-core/pkg/db"
 )
 
 // Defining the Graphql handler
@@ -36,6 +37,10 @@ func playgroundHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)
 	}
+}
+
+func init() {
+	db.Connect()
 }
 
 func main() {

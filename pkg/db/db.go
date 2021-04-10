@@ -7,7 +7,9 @@ import (
 	"github.com/go-pg/pg"
 )
 
-func Connect() (*pg.DB){ 
+var DB *pg.DB
+
+func Connect() { 
 	opt, err := pg.ParseURL(setting.Get().Database.URI)
 	if err != nil {
  	  panic(err)
@@ -15,5 +17,5 @@ func Connect() (*pg.DB){
 
 	db := pg.Connect(opt)
 	fmt.Println("Connected to",db.Options().Addr)
-	return db
+	DB = db
 }

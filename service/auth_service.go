@@ -12,7 +12,7 @@ import (
 )
 
 func Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutput, error) {
-	db := db.Connect()
+	db := db.DB
 	user := &entity.User{
 		Username: input.Username,
 		Email: input.Email,
@@ -51,7 +51,7 @@ func Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutpu
 }
 
 func Login(ctx context.Context, input *model.LoginInput) (*model.AuthOutput, error) {
-	db := db.Connect()
+	db := db.DB
 	user := new(entity.User)
 	password := new(entity.Password)
 

@@ -13,7 +13,7 @@ import (
 )
 
 func AddPost(ctx context.Context, input *model.AddPostInput) (*model.Post, error) {
-	db := db.Connect()
+	db := db.DB
 	isUser, err := util.ValidateUserToken(ctx)	
 	if (err != nil) {
 		return nil, gqlerror.Errorf(err.Error())
@@ -47,7 +47,7 @@ func AddPost(ctx context.Context, input *model.AddPostInput) (*model.Post, error
 }
 
 func GetPost(ctx context.Context, input *model.GetPostInput) (*model.Post, error) {
-	db := db.Connect()
+	db := db.DB
 	_, err := util.ValidateUserToken(ctx)	
 	if (err != nil) {
 		return nil, gqlerror.Errorf(err.Error())
@@ -82,7 +82,7 @@ func GetPost(ctx context.Context, input *model.GetPostInput) (*model.Post, error
 }
 
 func GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInput) ([]*model.Post, error) {
-	db := db.Connect()
+	db := db.DB
 	_, err := util.ValidateUserToken(ctx)	
 	if (err != nil) {
 		return nil, gqlerror.Errorf(err.Error())
@@ -123,7 +123,7 @@ func GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInpu
 }
 
 func DeletePost(ctx context.Context, input *model.DeletePostInput) (*model.Post, error) {
-	db := db.Connect()
+	db := db.DB
 	isUser, err := util.ValidateUserToken(ctx)	
 	if (err != nil) {
 		return nil, gqlerror.Errorf(err.Error())
@@ -164,7 +164,7 @@ func DeletePost(ctx context.Context, input *model.DeletePostInput) (*model.Post,
 }
 
 func EditPost(ctx context.Context, input *model.EditPostInput) (*model.Post, error) {
-	db := db.Connect()
+	db := db.DB
 	isUser, err := util.ValidateUserToken(ctx)	
 	if (err != nil) {
 		return nil, gqlerror.Errorf(err.Error())
