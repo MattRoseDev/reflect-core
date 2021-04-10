@@ -6,4 +6,5 @@ type DatabaseConfiguration struct {
 	User string
 	Password string
 	Name string
+	URI string
 }

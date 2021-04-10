@@ -8,12 +8,12 @@ import (
 )
 
 func Connect() (*pg.DB){ 
-	db := pg.Connect(&pg.Options{
-		Addr: setting.Get().Database.Host  + ":" + fmt.Sprint(setting.Get().Database.Port),
-		User: setting.Get().Database.User,
-		Password: setting.Get().Database.Password, 
-		Database: setting.Get().Database.Name,
-	})
+	opt, err := pg.ParseURL(setting.Get().Database.URI)
+	if err != nil {
+ 	  panic(err)
+	}
+
+	db := pg.Connect(opt)
 	fmt.Println("Connected to",db.Options().Addr)
 	return db
 }
