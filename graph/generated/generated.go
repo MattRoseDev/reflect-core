@@ -403,8 +403,8 @@ input LoginInput {
 }
 
 input RegisterInput {
+  fullname: String!
   email: String!
-  username: String!
   password: String!
 }
 
@@ -2873,19 +2873,19 @@ func (ec *executionContext) unmarshalInputRegisterInput(ctx context.Context, obj
 
 	for k, v := range asMap {
 		switch k {
+		case "fullname":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullname"))
+			it.Fullname, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "email":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			it.Email, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "username":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
-			it.Username, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

@@ -14,14 +14,12 @@ import (
 func Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutput, error) {
 	db := db.DB
 	user := &entity.User{
-		Username: input.Username,
+		Username: util.RandomString(12),
 		Email: input.Email,
 	}
 	isUser := &entity.User{}
-	db.Model(isUser).Where("username = ?", input.Username).WhereOr("email = ?", input.Email).Where("deleted_at is ?", nil).Returning("*").Select()	
-	if (isUser.Username == input.Username) {
-		return nil, gqlerror.Errorf("Username has already taken")
-	}
+
+	db.Model(isUser).Where("email = ?", input.Email).Where("deleted_at is ?", nil).Returning("*").Select()	
 
 	if (isUser.Email == input.Email) {
 		return nil, gqlerror.Errorf("Email has already taken")
@@ -35,7 +33,7 @@ func Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutpu
 		Password: hashedPassword,
 	}	
 	db.Model(password).Insert()
-	token, _ := util.GenerateToken(user.Id, input.Username)
+	token, _ := util.GenerateToken(user.Id, user.Username)
 	return &model.AuthOutput{
 		Token: token,
 		User: &model.User{
@@ -55,7 +53,7 @@ func Login(ctx context.Context, input *model.LoginInput) (*model.AuthOutput, err
 	user := new(entity.User)
 	password := new(entity.Password)
 
-	db.Model(user).Where("username = ?", input.Username).Where("deleted_at is ?", nil).Select()
+	db.Model(user).Where("username = ?", input.Username).WhereOr("email = ?", input.Username).Where("deleted_at is ?", nil).Select()
 	if (len(user.Id) <= 0) {
 		return nil, gqlerror.Errorf("Username or Password is not valid")
 	}

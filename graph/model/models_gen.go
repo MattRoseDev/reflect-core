@@ -48,8 +48,8 @@ type Post struct {
 }
 
 type RegisterInput struct {
+	Fullname string `json:"fullname"`
 	Email    string `json:"email"`
-	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
