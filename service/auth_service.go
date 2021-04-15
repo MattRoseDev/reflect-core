@@ -16,6 +16,7 @@ func Register(ctx context.Context, input *model.RegisterInput) (*model.AuthOutpu
 	user := &entity.User{
 		Username: util.RandomString(12),
 		Email: input.Email,
+		Fullname: &input.Fullname,
 	}
 	isUser := &entity.User{}
 
