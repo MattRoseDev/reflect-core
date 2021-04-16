@@ -15,6 +15,7 @@
 # vendor/
 
 /tmp
+.env
 
 # config
 config.yml

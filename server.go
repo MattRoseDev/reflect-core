@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"log"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -41,10 +44,17 @@ func playgroundHandler() gin.HandlerFunc {
 
 func init() {
 	db.Connect()
+	err := godotenv.Load()
+  if err != nil {
+    log.Fatal("Error loading .env file")
+  }
 }
 
 func main() {
 	// Setting up Gin
+	port := os.Getenv("PORT")
+	mode := os.Getenv("GIN_MODE")
+	gin.SetMode(mode)
 	r := gin.Default()
 	r.Use(GinContextToContextMiddleware())
 	config := cors.DefaultConfig()
@@ -52,5 +62,5 @@ func main() {
 	r.Use(cors.New(config))
 	r.POST("/query", graphqlHandler())
 	r.GET("/", playgroundHandler())
-	r.Run()
+	r.Run(":" + port)
 }
