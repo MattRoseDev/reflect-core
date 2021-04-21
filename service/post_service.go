@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/favecode/reflect-core/entity"
@@ -94,7 +93,6 @@ func GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInpu
 	result := make([]*model.Post, 0)
 
 	for _, post := range *posts {
-		fmt.Println(post)
 		result = append(result, &model.Post{
 			ID: post.Id,
 			User: &model.User{
@@ -113,8 +111,6 @@ func GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInpu
 			DeletedAt: post.DeletedAt,		
 		})
 	}	
-
-	fmt.Println(result[0])
 
 	return result , nil
 }
