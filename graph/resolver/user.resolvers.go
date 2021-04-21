@@ -13,3 +13,7 @@ import (
 func (r *queryResolver) GetUserInfo(ctx context.Context) (*model.User, error) {
 	return service.GetUserInfo(ctx)
 }
+
+func (r *queryResolver) GetUserByUsername(ctx context.Context, input *model.GetUserByUsernameInput) (*model.User, error) {
+	return service.GetUserByUsername(ctx, input)
+}

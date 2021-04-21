@@ -69,6 +69,7 @@ type ComplexityRoot struct {
 	Query struct {
 		GetPost            func(childComplexity int, input *model.GetPostInput) int
 		GetPostsByUsername func(childComplexity int, input *model.GetPostsByUsernameInput) int
+		GetUserByUsername  func(childComplexity int, input *model.GetUserByUsernameInput) int
 		GetUserInfo        func(childComplexity int) int
 		Login              func(childComplexity int, input *model.LoginInput) int
 	}
@@ -97,6 +98,7 @@ type QueryResolver interface {
 	GetPost(ctx context.Context, input *model.GetPostInput) (*model.Post, error)
 	GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInput) ([]*model.Post, error)
 	GetUserInfo(ctx context.Context) (*model.User, error)
+	GetUserByUsername(ctx context.Context, input *model.GetUserByUsernameInput) (*model.User, error)
 }
 
 type executableSchema struct {
@@ -248,6 +250,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GetPostsByUsername(childComplexity, args["input"].(*model.GetPostsByUsernameInput)), true
+
+	case "Query.getUserByUsername":
+		if e.complexity.Query.GetUserByUsername == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getUserByUsername_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetUserByUsername(childComplexity, args["input"].(*model.GetUserByUsernameInput)), true
 
 	case "Query.getUserInfo":
 		if e.complexity.Query.GetUserInfo == nil {
@@ -475,8 +489,13 @@ extend type Mutation {
   deletedAt: Time
 }
 
+input GetUserByUsernameInput {
+  username: String!
+}
+
 extend type Query {
   getUserInfo: User!
+  getUserByUsername(input: GetUserByUsernameInput): User!
 }
 `, BuiltIn: false},
 }
@@ -583,6 +602,21 @@ func (ec *executionContext) field_Query_getPostsByUsername_args(ctx context.Cont
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalOGetPostsByUsernameInput2ᚖgithubᚗcomᚋfavecodeᚋreflectᚑcoreᚋgraphᚋmodelᚐGetPostsByUsernameInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getUserByUsername_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.GetUserByUsernameInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOGetUserByUsernameInput2ᚖgithubᚗcomᚋfavecodeᚋreflectᚑcoreᚋgraphᚋmodelᚐGetUserByUsernameInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1257,6 +1291,48 @@ func (ec *executionContext) _Query_getUserInfo(ctx context.Context, field graphq
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().GetUserInfo(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋfavecodeᚋreflectᚑcoreᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_getUserByUsername(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_getUserByUsername_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetUserByUsername(rctx, args["input"].(*model.GetUserByUsernameInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2839,6 +2915,26 @@ func (ec *executionContext) unmarshalInputGetPostsByUsernameInput(ctx context.Co
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputGetUserByUsernameInput(ctx context.Context, obj interface{}) (model.GetUserByUsernameInput, error) {
+	var it model.GetUserByUsernameInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "username":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
+			it.Username, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputLoginInput(ctx context.Context, obj interface{}) (model.LoginInput, error) {
 	var it model.LoginInput
 	var asMap = obj.(map[string]interface{})
@@ -3097,6 +3193,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getUserInfo(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "getUserByUsername":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getUserByUsername(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -3828,6 +3938,14 @@ func (ec *executionContext) unmarshalOGetPostsByUsernameInput2ᚖgithubᚗcomᚋ
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputGetPostsByUsernameInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOGetUserByUsernameInput2ᚖgithubᚗcomᚋfavecodeᚋreflectᚑcoreᚋgraphᚋmodelᚐGetUserByUsernameInput(ctx context.Context, v interface{}) (*model.GetUserByUsernameInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputGetUserByUsernameInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

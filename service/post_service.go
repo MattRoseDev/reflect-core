@@ -13,7 +13,6 @@ import (
 )
 
 func AddPost(ctx context.Context, input *model.AddPostInput) (*model.Post, error) {
-	db := db.DB
 	isUser, err := util.ValidateUserToken(ctx)	
 	if (err != nil) {
 		return nil, gqlerror.Errorf(err.Error())
@@ -25,7 +24,7 @@ func AddPost(ctx context.Context, input *model.AddPostInput) (*model.Post, error
 		Link: util.RandomString(12),
 	}
 
-	db.Model(post).Returning("*").Insert()
+	db.DB.Model(post).Returning("*").Insert()
 
 	return &model.Post{
 		ID: post.Id,
@@ -47,7 +46,6 @@ func AddPost(ctx context.Context, input *model.AddPostInput) (*model.Post, error
 }
 
 func GetPost(ctx context.Context, input *model.GetPostInput) (*model.Post, error) {
-	db := db.DB
 	_, err := util.ValidateUserToken(ctx)	
 	if (err != nil) {
 		return nil, gqlerror.Errorf(err.Error())
@@ -55,8 +53,8 @@ func GetPost(ctx context.Context, input *model.GetPostInput) (*model.Post, error
 
 	post := &entity.Post{}
 	user := &entity.User{}
-	db.Model(post).Where("id = ?", input.PostID).Where("deleted_at is ?", nil).Returning("*").Select()
-	db.Model(user).Where("id = ?", input.PostID).Where("deleted_at is ?", nil).Returning("*").Select()
+	db.DB.Model(post).Where("id = ?", input.PostID).Where("deleted_at is ?", nil).Returning("*").Select()
+	db.DB.Model(user).Where("id = ?", input.PostID).Where("deleted_at is ?", nil).Returning("*").Select()
 
 	if(len(post.Id) <= 0) {
 		return nil, gqlerror.Errorf("PostId is not valid")	
@@ -82,7 +80,6 @@ func GetPost(ctx context.Context, input *model.GetPostInput) (*model.Post, error
 }
 
 func GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInput) ([]*model.Post, error) {
-	db := db.DB
 	_, err := util.ValidateUserToken(ctx)	
 	if (err != nil) {
 		return nil, gqlerror.Errorf(err.Error())
@@ -90,9 +87,9 @@ func GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInpu
 
 	posts := &[]entity.Post{}
 	user := &entity.User{}
-	db.Model(user).Where("username = ?", input.Username).Where("deleted_at is ?", nil).Returning("*").Select()
+	db.DB.Model(user).Where("username = ?", input.Username).Where("deleted_at is ?", nil).Returning("*").Select()
 
-	db.Model(posts).Where("user_id = ?", user.Id).Order("created_at DESC").Returning("*").Select()
+	db.DB.Model(posts).Where("user_id = ?", user.Id).Order("created_at DESC").Returning("*").Select()
 
 	result := make([]*model.Post, 0)
 
@@ -123,7 +120,6 @@ func GetPostsByUsername(ctx context.Context, input *model.GetPostsByUsernameInpu
 }
 
 func DeletePost(ctx context.Context, input *model.DeletePostInput) (*model.Post, error) {
-	db := db.DB
 	isUser, err := util.ValidateUserToken(ctx)	
 	if (err != nil) {
 		return nil, gqlerror.Errorf(err.Error())
@@ -131,7 +127,7 @@ func DeletePost(ctx context.Context, input *model.DeletePostInput) (*model.Post,
 
 	isPost := new(entity.Post)
 
-	db.Model(isPost).Where("id = ?", input.PostID).Returning("*").Select()
+	db.DB.Model(isPost).Where("id = ?", input.PostID).Returning("*").Select()
 	if (len(isPost.Id) <= 0) {
 		return nil, gqlerror.Errorf("Post not found")
 	}
@@ -142,7 +138,7 @@ func DeletePost(ctx context.Context, input *model.DeletePostInput) (*model.Post,
 		Id: input.PostID,
 		DeletedAt: &DeletedAt,
 	}
-	db.Model(post).Set("deleted_at = ?deleted_at").Where("id = ?id").Returning("*").Update()
+	db.DB.Model(post).Set("deleted_at = ?deleted_at").Where("id = ?id").Returning("*").Update()
 
 	return &model.Post{
 		ID: post.Id,
@@ -164,7 +160,6 @@ func DeletePost(ctx context.Context, input *model.DeletePostInput) (*model.Post,
 }
 
 func EditPost(ctx context.Context, input *model.EditPostInput) (*model.Post, error) {
-	db := db.DB
 	isUser, err := util.ValidateUserToken(ctx)	
 	if (err != nil) {
 		return nil, gqlerror.Errorf(err.Error())
@@ -175,7 +170,7 @@ func EditPost(ctx context.Context, input *model.EditPostInput) (*model.Post, err
 		Content: input.Content,
 	}
 
-	db.Model(post).Set("content = ?content").Where("id = ?id").Returning("*").Update()
+	db.DB.Model(post).Set("content = ?content").Where("id = ?id").Returning("*").Update()
 
 	return &model.Post{
 		ID: post.Id,

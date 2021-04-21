@@ -73,7 +73,6 @@ func GetDataFromHeaderWithKey(ctx context.Context, key string) (string, error) {
 }
 
 func ValidateUserToken(ctx context.Context) (*entity.User, error) {
-	db := db.DB
 	token, _ := GetDataFromHeaderWithKey(ctx, "token")
 	userData, _ := ParseToken(token)
 
@@ -83,7 +82,7 @@ func ValidateUserToken(ctx context.Context) (*entity.User, error) {
 
 	isUser := &entity.User{}
 
-	db.Model(isUser).Where("id = ?", userData.Id).Where("deleted_at is ?", nil).Returning("*").Select()
+	db.DB.Model(isUser).Where("id = ?", userData.Id).Where("deleted_at is ?", nil).Returning("*").Select()
 
 	if (len(isUser.Id) <= 0) {
 		return nil, fmt.Errorf("UserId is not valid")

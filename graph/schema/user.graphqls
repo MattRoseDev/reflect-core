@@ -10,6 +10,11 @@ type User {
   deletedAt: Time
 }
 
+input GetUserByUsernameInput {
+  username: String!
+}
+
 extend type Query {
   getUserInfo: User!
+  getUserByUsername(input: GetUserByUsernameInput): User!
 }

@@ -32,6 +32,10 @@ type GetPostsByUsernameInput struct {
 	Username string `json:"username"`
 }
 
+type GetUserByUsernameInput struct {
+	Username string `json:"username"`
+}
+
 type LoginInput struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
